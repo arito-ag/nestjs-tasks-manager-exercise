@@ -22,7 +22,7 @@ export class AuthService {
 
   async register(user: RegisterDto) {
     // Validate if user already exist
-    const { username, password } = user;
+    const { username } = user;
     const userFound = await this.usersService.findOneByUsername(username);
 
     if (userFound)
