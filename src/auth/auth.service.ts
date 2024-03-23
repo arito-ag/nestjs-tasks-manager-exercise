@@ -44,11 +44,10 @@ export class AuthService {
   async register(user: RegisterDto) {
     // Validate if user already exist
     const { username } = user;
-    user.password = await bcryptjs.hash(user.password, 10);
     const userFound = await this.usersService.findOneByUsername(username);
-
     if (userFound) throw new BadRequestException('User already exists');
 
+    user.password = await bcryptjs.hash(user.password, 10);
     return this.usersService.create(user);
   }
 }
