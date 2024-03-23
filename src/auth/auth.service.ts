@@ -1,25 +1,17 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { RegisterUserDto } from './dto/register-user.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { LoginUserDto } from './dto/login-user.dto';
-import { User } from 'src/users/entities/user.entity';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
-  ) {}
+  constructor(private readonly usersService: UsersService) {}
 
   // This service will be used to authenticate user who is logging in. This is only the base code
-  async getUser(user: LoginUserDto) {
+  async login(user: LoginDto) {
     const { username, password } = user;
     // Validate if user exist
-    const userFound = await this.userRepository.findOne({
-      where: {
-        username,
-      },
-    });
+    const userFound = await this.usersService.findOneByUsername(username);
 
     if (!userFound)
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
@@ -28,18 +20,14 @@ export class AuthService {
     else throw new HttpException('Incorrect password', HttpStatus.BAD_REQUEST);
   }
 
-  async createUser(user: RegisterUserDto) {
+  async register(user: RegisterDto) {
     // Validate if user already exist
-    const userFound = await this.userRepository.findOne({
-      where: {
-        username: user.username,
-      },
-    });
+    const { username, password } = user;
+    const userFound = await this.usersService.findOneByUsername(username);
 
     if (userFound)
       throw new HttpException('User already exists', HttpStatus.CONFLICT);
 
-    const newUser = this.userRepository.create(user);
-    return this.userRepository.save(newUser);
+    return this.usersService.create(user);
   }
 }
