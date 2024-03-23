@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from 'src/auth/user.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'tasks' })
 export class Task {
@@ -21,11 +22,6 @@ export class Task {
   @Column({ nullable: true })
   comments: string;
 
-  // ToDo: Relation with User
-  /**
-   * @ManyToOne()
-   */
-
   @Column({ nullable: true })
   tags: string;
 
@@ -38,4 +34,10 @@ export class Task {
 
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
+
+  @Column()
+  userId: number;
+
+  @ManyToOne(() => User, (user) => user.tasks)
+  user: User;
 }
