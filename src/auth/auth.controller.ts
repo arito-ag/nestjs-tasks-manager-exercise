@@ -10,7 +10,7 @@ import { RegisterDto } from './dto/register.dto';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from './guard/auth.guard';
-import { Request as Req } from 'express';
+import { RequestWithUser } from './interface/request-with-user.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -28,7 +28,7 @@ export class AuthController {
 
   @Get('profile')
   @UseGuards(AuthGuard)
-  profile(@Request() req: Req) {
-    return req['user'];
+  profile(@Request() req: RequestWithUser) {
+    return req.user;
   }
 }

@@ -48,6 +48,11 @@ export class AuthService {
     if (userFound) throw new BadRequestException('User already exists');
 
     user.password = await bcryptjs.hash(user.password, 10);
-    return this.usersService.create(user);
+    await this.usersService.create(user);
+
+    return {
+      username,
+      message: 'Welcome to Task Manager',
+    };
   }
 }
