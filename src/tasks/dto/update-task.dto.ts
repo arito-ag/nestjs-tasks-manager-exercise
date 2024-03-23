@@ -5,4 +5,5 @@ export class UpdateTaskDto {
   comments?: string;
   tags?: string;
   file?: string;
+  status?: string;
 }

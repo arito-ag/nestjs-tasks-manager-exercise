@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
 import { Task } from './entities/task.entity';
@@ -42,6 +46,12 @@ export class TasksService {
     const taskFound = await this.taskRepository.findOne({ where: { id } });
     if (!taskFound) throw new NotFoundException('Task not exist');
 
+    const validateStatus =
+      task.status !== undefined ? this.findStatusInConstant(task.status) : true;
+
+    if (!validateStatus)
+      throw new BadRequestException('That Task Status is not allowed');
+
     const updateTask = Object.assign(taskFound, task);
     return this.taskRepository.save(updateTask);
   }
@@ -52,5 +62,10 @@ export class TasksService {
       throw new NotFoundException('Task not exist');
 
     return deletedTask;
+  }
+
+  private findStatusInConstant(status: string): boolean {
+    const claves = Object.values(TASK_STATUS);
+    return claves.includes(status);
   }
 }
