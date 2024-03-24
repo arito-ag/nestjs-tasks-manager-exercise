@@ -78,7 +78,7 @@ export class TasksService {
   }
 
   private findStatusInConstant(status: string): boolean {
-    const claves = Object.values(TASK_STATUS);
-    return claves.includes(status);
+    const keys = Object.values(TASK_STATUS);
+    return keys.includes(status);
   }
 }
