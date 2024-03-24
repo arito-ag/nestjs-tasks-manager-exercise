@@ -19,14 +19,14 @@ export class Task {
   @Column({ type: 'date', nullable: false })
   deadline: Date;
 
-  @Column({ nullable: true })
+  @Column()
   comments: string;
 
-  @Column({ nullable: true })
+  @Column()
   tags: string;
 
   // FILE PATH FROM BUCKET
-  @Column({ nullable: true })
+  @Column()
   file: string;
 
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
@@ -35,7 +35,7 @@ export class Task {
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
 
-  @Column()
+  @Column({ nullable: false })
   userId: number;
 
   @ManyToOne(() => User, (user) => user.tasks)
