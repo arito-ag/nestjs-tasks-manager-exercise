@@ -6,6 +6,8 @@ import { AuthModule } from './auth/auth.module';
 import { TasksModule } from './tasks/tasks.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { UsersModule } from './users/users.module';
+import { APP_PIPE } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 
 @Module({
   imports: [
@@ -26,6 +28,6 @@ import { UsersModule } from './users/users.module';
     UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [{ provide: APP_PIPE, useClass: ValidationPipe }, AppService],
 })
 export class AppModule {}
