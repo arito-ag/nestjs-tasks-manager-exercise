@@ -19,14 +19,14 @@ export class Task {
   @Column({ type: 'date', nullable: false })
   deadline: Date;
 
-  @Column()
+  @Column({ nullable: true })
   comments: string;
 
-  @Column()
+  @Column({ nullable: true })
   tags: string;
 
   // FILE PATH FROM BUCKET
-  @Column()
+  @Column({ nullable: true })
   file: string;
 
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
