@@ -49,7 +49,6 @@ export class AuthService {
   }
 
   async register(user: RegisterDto) {
-    // Validate if user already exist
     const { username } = user;
     const userFound = await this.usersService.findByUsername(username);
     if (userFound) throw new BadRequestException('User already exists');
@@ -65,7 +64,7 @@ export class AuthService {
 
     return {
       username,
-      message: 'Welcome to Task Manager',
+      message: 'Welcome to Task Manager. Register Successfully',
     };
   }
 }
