@@ -1,7 +1,13 @@
 export const TRANSACTION_TYPES = {
   USER: {
-    REGISTER: 'USER_REGISTERED',
-    LOGIN: 'USER_LOGGED',
+    COMPLETED: {
+      REGISTER: 'USER_REGISTERED',
+      LOGIN: 'USER_LOGGED',
+    },
+    ERROR: {
+      REGISTER: 'USER_REGISTERED_ERROR',
+      LOGIN: 'USER_LOGGED_ERROR',
+    },
   },
   TASK: {
     COMPLETED: {

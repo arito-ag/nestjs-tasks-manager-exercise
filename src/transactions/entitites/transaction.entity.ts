@@ -15,7 +15,7 @@ export class Transaction {
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   userId: number;
 
   @ManyToOne(() => User, (user) => user.transactions)

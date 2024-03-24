@@ -11,7 +11,7 @@ export class TransactionsService {
     private readonly transactionRepository: Repository<Transaction>,
   ) {}
 
-  create(type: string, description: string, userId: number) {
+  create(type: string, description: string, userId?: number) {
     const validateType = this.findTypeInConstant(type);
 
     if (!validateType)
@@ -27,18 +27,22 @@ export class TransactionsService {
   }
 
   private findTypeInConstant(type: string): boolean {
-    const keysUser = Object.values(TRANSACTION_TYPES.USER);
+    const keysUser = Object.values(TRANSACTION_TYPES.USER.COMPLETED);
+    const keysUserError = Object.values(TRANSACTION_TYPES.USER.ERROR);
     const keysTask = Object.values(TRANSACTION_TYPES.TASK.COMPLETED);
     const keysTaskError = Object.values(TRANSACTION_TYPES.TASK.ERROR);
 
     const isValidUserTransaction = keysUser.includes(type);
+    const isValidUserErrorTransaction = keysUserError.includes(type);
     const isValidTaskTransaction = keysTask.includes(type);
     const isValidTaskErrorTransaction = keysTaskError.includes(type);
 
     return isValidUserTransaction
       ? isValidUserTransaction
-      : isValidTaskTransaction
-        ? isValidTaskTransaction
-        : isValidTaskErrorTransaction;
+      : isValidUserErrorTransaction
+        ? isValidUserErrorTransaction
+        : isValidTaskTransaction
+          ? isValidTaskTransaction
+          : isValidTaskErrorTransaction;
   }
 }
