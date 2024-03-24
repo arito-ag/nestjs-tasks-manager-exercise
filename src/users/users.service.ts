@@ -15,7 +15,7 @@ export class UsersService {
     return this.userRepository.save(createUserDto);
   }
 
-  findOneByUsername(username: string) {
+  findByUsername(username: string) {
     return this.userRepository.findOne({
       where: {
         username,

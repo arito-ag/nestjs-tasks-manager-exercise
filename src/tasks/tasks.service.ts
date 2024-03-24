@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
@@ -18,50 +19,62 @@ export class TasksService {
     private readonly userService: UsersService,
   ) {}
 
-  getAll(userId: number) {
+  async getAll(username: string) {
+    const userFound = await this.userService.findByUsername(username);
+    const userId = userFound.id;
     return this.taskRepository.find({ where: { userId } });
   }
 
   async getById(id: number) {
-    const taskFound = await this.taskRepository.findBy({ id });
-    if (!taskFound) throw new NotFoundException('Task not exist');
+    const taskFound = await this.taskRepository.findOne({
+      where: {
+        id,
+      },
+    });
 
+    if (!taskFound) throw new UnauthorizedException();
     return taskFound;
   }
 
-  getByFilters(userId: number) {
+  async getByFilters(username: string) {
+    const userFound = await this.userService.findByUsername(username);
+    const userId = userFound.id;
     return this.taskRepository.find({ where: { userId } });
   }
 
-  async create(task: CreateTaskDto) {
-    const userFound = await this.userService.findById(task.userId);
+  async create(username: string, task: CreateTaskDto) {
+    const userFound = await this.userService.findByUsername(username);
     if (!userFound) throw new NotFoundException('User not found');
 
     task['status'] = TASK_STATUS.PENDING;
     const newTask = this.taskRepository.create(task);
+    newTask.userId = userFound.id;
     return this.taskRepository.save(newTask);
   }
 
   async update(id: number, task: UpdateTaskDto) {
-    const taskFound = await this.taskRepository.findOne({ where: { id } });
-    if (!taskFound) throw new NotFoundException('Task not exist');
-
     const validateStatus =
       task.status !== undefined ? this.findStatusInConstant(task.status) : true;
 
     if (!validateStatus)
-      throw new BadRequestException('That Task Status is not allowed');
+      throw new BadRequestException(
+        `That Task Status: "${task.status}" is not allowed`,
+      );
 
-    const updateTask = Object.assign(taskFound, task);
-    return this.taskRepository.save(updateTask);
+    return this.taskRepository.update(id, task);
   }
 
   async delete(id: number) {
     const deletedTask = await this.taskRepository.delete({ id });
-    if (deletedTask.affected === 0)
-      throw new NotFoundException('Task not exist');
-
     return deletedTask;
+  }
+
+  async getByTaskIdAndUserId(id: number, userId: number) {
+    const taskFound = await this.taskRepository.findOne({
+      where: { id, userId },
+    });
+    if (!taskFound) throw new UnauthorizedException();
+    return taskFound;
   }
 
   private findStatusInConstant(status: string): boolean {
