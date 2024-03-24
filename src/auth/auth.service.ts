@@ -22,7 +22,7 @@ export class AuthService {
     const { username, password } = user;
 
     // Validate if user exist
-    const userFound = await this.usersService.findOneByUsername(username);
+    const userFound = await this.usersService.findByUsername(username);
     if (!userFound) throw new NotFoundException('User not found');
 
     // Validate password match
@@ -44,10 +44,15 @@ export class AuthService {
   async register(user: RegisterDto) {
     // Validate if user already exist
     const { username } = user;
-    const userFound = await this.usersService.findOneByUsername(username);
+    const userFound = await this.usersService.findByUsername(username);
     if (userFound) throw new BadRequestException('User already exists');
 
     user.password = await bcryptjs.hash(user.password, 10);
-    return this.usersService.create(user);
+    await this.usersService.create(user);
+
+    return {
+      username,
+      message: 'Welcome to Task Manager',
+    };
   }
 }

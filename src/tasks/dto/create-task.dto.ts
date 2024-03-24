@@ -1,9 +1,32 @@
+import {
+  IsDateString,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+
 export class CreateTaskDto {
+  @IsString()
+  @IsNotEmpty()
   title: string;
+
+  @IsString()
+  @IsNotEmpty()
   description: string;
-  deadline: string;
+
+  @IsString()
+  @IsDateString()
+  deadline: Date;
+
+  @IsString()
+  @IsOptional()
   comments?: string;
+
+  @IsString()
+  @IsOptional()
   tags?: string;
+
+  @IsString()
+  @IsOptional()
   file?: string;
-  userId: number;
 }
