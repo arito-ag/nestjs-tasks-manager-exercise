@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Patch,
@@ -22,7 +24,7 @@ export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   // OK
-  @Get('')
+  @Get()
   @UseGuards(AuthGuard)
   async getAllTasks(@Request() req: RequestWithUser) {
     const { username } = req.user;
@@ -37,7 +39,7 @@ export class TasksController {
   }
 
   // ToDo: Add Filters
-  @Get('filters')
+  @Get('filtered')
   @UseGuards(AuthGuard)
   getTaskByFilters(@Request() req: RequestWithUser) {
     const { username } = req.user;
@@ -53,12 +55,14 @@ export class TasksController {
   }
 
   @Patch(':id')
+  @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard, TaskGuard)
   updateTask(@Param('id') id: number, @Body() task: UpdateTaskDto) {
     return this.tasksService.update(id, task);
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard, TaskGuard)
   deleteTask(@Param('id', ParseIntPipe) id: number) {
     return this.tasksService.delete(id);
