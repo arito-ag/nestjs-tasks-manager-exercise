@@ -4,7 +4,6 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { RequestWithUser } from '../interface/request-with-user.interface';
 import { TasksService } from 'src/tasks/tasks.service';
 import { UsersService } from 'src/users/users.service';
@@ -12,7 +11,6 @@ import { UsersService } from 'src/users/users.service';
 @Injectable()
 export class TaskGuard implements CanActivate {
   constructor(
-    private readonly jwtService: JwtService,
     private readonly taskService: TasksService,
     private readonly userService: UsersService,
   ) {}

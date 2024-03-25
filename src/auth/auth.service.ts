@@ -20,36 +20,37 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  // This service will be used to authenticate user who is logging in. This is only the base code
   async login(user: LoginDto) {
     const { username, password } = user;
 
     const userFound = await this.usersService.findByUsername(username);
-    if (!userFound) throw new NotFoundException('User not found');
+    if (!userFound) {
+      throw new NotFoundException(`User ${username} not found`);
+    }
 
     const isPasswordValid = await bcryptjs.compare(
       password,
       userFound.password,
     );
-    if (!isPasswordValid) throw new UnauthorizedException('Incorrect password');
+    if (!isPasswordValid) {
+      throw new UnauthorizedException(
+        `Username or password is wrong for ${username}`,
+      );
+    }
 
     const payload = { username: userFound.username };
     const token = await this.jwtService.signAsync(payload);
 
-    await this.transactionsService.create(
-      TRANSACTION_TYPES.USER.LOGIN,
-      `User: ${username} logged in`,
-      userFound.id,
-    );
+    await this.transactionsService.create({
+      type: TRANSACTION_TYPES.COMPLETED,
+      description: `User: ${username} logged in`,
+      userId: userFound.id,
+    });
 
-    return {
-      token,
-      username,
-    };
+    return { token, username };
   }
 
   async register(user: RegisterDto) {
-    // Validate if user already exist
     const { username } = user;
     const userFound = await this.usersService.findByUsername(username);
     if (userFound) throw new BadRequestException('User already exists');
@@ -57,15 +58,15 @@ export class AuthService {
     user.password = await bcryptjs.hash(user.password, 10);
     const userCreated = await this.usersService.create(user);
 
-    await this.transactionsService.create(
-      TRANSACTION_TYPES.USER.REGISTER,
-      `User: ${username} registered`,
-      userCreated.id,
-    );
+    await this.transactionsService.create({
+      type: TRANSACTION_TYPES.COMPLETED,
+      description: `User: ${username} registered`,
+      userId: userCreated.id,
+    });
 
     return {
       username,
-      message: 'Welcome to Task Manager',
+      message: 'Welcome to Task Manager. Register Successfully',
     };
   }
 }
