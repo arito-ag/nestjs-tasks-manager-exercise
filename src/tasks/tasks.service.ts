@@ -21,20 +21,50 @@ export class TasksService {
     private readonly transactionsService: TransactionsService,
   ) {}
 
+  private readonly manyTasksFields = {
+    id: true,
+    title: true,
+    description: true,
+    deadline: true,
+    status: true,
+  };
+
+  private readonly oneTaskFields = {
+    id: true,
+    title: true,
+    description: true,
+    deadline: true,
+    comments: true,
+    tags: true,
+    file: true,
+    createdAt: true,
+    updatedAt: true,
+    status: true,
+  };
+
   async getAll(username: string) {
     const userFound = await this.usersService.findByUsername(username);
     const userId = userFound.id;
-    return this.taskRepository.find({ where: { userId } });
+    return this.taskRepository.find({
+      where: { userId },
+      select: this.manyTasksFields,
+    });
   }
 
   getById(id: number) {
-    return this.taskRepository.findOne({ where: { id } });
+    return this.taskRepository.findOne({
+      where: { id },
+      select: this.oneTaskFields,
+    });
   }
 
   async getByFilters(username: string) {
     const userFound = await this.usersService.findByUsername(username);
     const userId = userFound.id;
-    return this.taskRepository.find({ where: { userId } });
+    return this.taskRepository.find({
+      where: { userId },
+      select: this.manyTasksFields,
+    });
   }
 
   async create(username: string, task: CreateTaskDto) {
@@ -66,7 +96,7 @@ export class TasksService {
         `That Task Status: "${task.status}" is not allowed`,
       );
 
-    const taskUpdated = await this.taskRepository.update(id, task);
+    await this.taskRepository.update(id, task);
 
     await this.transactionsService.create({
       type: TRANSACTION_TYPES.COMPLETED,
@@ -74,12 +104,14 @@ export class TasksService {
       userId: taskInfo.userId,
     });
 
-    return taskUpdated;
+    return {
+      message: `Task: "${taskInfo.title}" updated`,
+    };
   }
 
   async delete(id: number) {
     const { task, user } = await this.getTaskAndUserInfo(id);
-    const deletedTask = await this.taskRepository.delete({ id });
+    await this.taskRepository.delete({ id });
 
     await this.transactionsService.create({
       type: TRANSACTION_TYPES.COMPLETED,
@@ -87,7 +119,9 @@ export class TasksService {
       userId: task.userId,
     });
 
-    return deletedTask;
+    return {
+      message: `Task: "${task.title}" deleted`,
+    };
   }
 
   async getByTaskIdAndUserId(id: number, userId: number) {
