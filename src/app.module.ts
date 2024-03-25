@@ -10,6 +10,8 @@ import { APP_PIPE } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AllExceptionsFilter } from 'src/filters/all-exceptions.filter';
 import { APP_FILTER } from '@nestjs/core';
+import { ConfigModule } from '@nestjs/config';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -24,10 +26,12 @@ import { APP_FILTER } from '@nestjs/core';
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
+    ConfigModule.forRoot({ isGlobal: true }),
     AuthModule,
     TasksModule,
     TransactionsModule,
     UsersModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [

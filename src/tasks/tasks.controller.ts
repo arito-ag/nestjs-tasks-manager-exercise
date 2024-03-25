@@ -2,16 +2,21 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
   HttpCode,
   HttpStatus,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   ParseIntPipe,
   Patch,
   Post,
   Query,
   Request,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { TasksService } from './tasks.service';
@@ -19,10 +24,15 @@ import { RequestWithUser } from 'src/auth/interface/request-with-user.interface'
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { TaskGuard } from 'src/auth/guard/task.guard';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UploadService } from 'src/upload/upload.service';
 
 @Controller('tasks')
 export class TasksController {
-  constructor(private readonly tasksService: TasksService) {}
+  constructor(
+    private readonly tasksService: TasksService,
+    private readonly uploadService: UploadService,
+  ) {}
 
   @Get()
   @UseGuards(AuthGuard)
@@ -55,8 +65,23 @@ export class TasksController {
 
   @Post()
   @UseGuards(AuthGuard)
-  createTask(@Request() req: RequestWithUser, @Body() task: CreateTaskDto) {
+  @UseInterceptors(FileInterceptor('file'))
+  async createTask(
+    @Request() req: RequestWithUser,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 50000 }),
+          new FileTypeValidator({ fileType: '.(png|jpeg|jpg|pdf)' }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+    @Body() task: CreateTaskDto,
+  ) {
     const { username } = req.user;
+    await this.uploadService.upload(file.originalname, file.buffer);
+    task.file = file.originalname;
     return this.tasksService.create(username, task);
   }
 
