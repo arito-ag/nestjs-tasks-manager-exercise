@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
 import { Task } from './entities/task.entity';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { TASK_STATUS } from './constants/status';
 import { UpdateTaskDto } from './dto/update-task.dto';
@@ -21,20 +21,58 @@ export class TasksService {
     private readonly transactionsService: TransactionsService,
   ) {}
 
-  async getAll(username: string) {
+  private readonly manyTasksFields = [
+    'task.id',
+    'task.title',
+    'task.description',
+    'task.deadline',
+    'task.status',
+    'task.file',
+  ];
+
+  private readonly oneTaskFields = {
+    id: true,
+    title: true,
+    description: true,
+    deadline: true,
+    comments: true,
+    tags: true,
+    file: true,
+    createdAt: true,
+    updatedAt: true,
+    status: true,
+  };
+
+  async getAll(
+    username: string,
+    keyword: string,
+    status: string,
+    daysLeft: string,
+    format: string,
+    page: string,
+    limit: string,
+  ) {
     const userFound = await this.usersService.findByUsername(username);
     const userId = userFound.id;
-    return this.taskRepository.find({ where: { userId } });
+
+    const queryToExecute = await this.prepareFilters(
+      keyword,
+      status,
+      daysLeft,
+      format,
+      userId,
+      page,
+      limit,
+    );
+
+    return queryToExecute.getMany();
   }
 
   getById(id: number) {
-    return this.taskRepository.findOne({ where: { id } });
-  }
-
-  async getByFilters(username: string) {
-    const userFound = await this.usersService.findByUsername(username);
-    const userId = userFound.id;
-    return this.taskRepository.find({ where: { userId } });
+    return this.taskRepository.findOne({
+      where: { id },
+      select: this.oneTaskFields,
+    });
   }
 
   async create(username: string, task: CreateTaskDto) {
@@ -66,7 +104,7 @@ export class TasksService {
         `That Task Status: "${task.status}" is not allowed`,
       );
 
-    const taskUpdated = await this.taskRepository.update(id, task);
+    await this.taskRepository.update(id, task);
 
     await this.transactionsService.create({
       type: TRANSACTION_TYPES.COMPLETED,
@@ -74,12 +112,14 @@ export class TasksService {
       userId: taskInfo.userId,
     });
 
-    return taskUpdated;
+    return {
+      message: `Task: "${taskInfo.title}" updated`,
+    };
   }
 
   async delete(id: number) {
     const { task, user } = await this.getTaskAndUserInfo(id);
-    const deletedTask = await this.taskRepository.delete({ id });
+    await this.taskRepository.delete({ id });
 
     await this.transactionsService.create({
       type: TRANSACTION_TYPES.COMPLETED,
@@ -87,7 +127,9 @@ export class TasksService {
       userId: task.userId,
     });
 
-    return deletedTask;
+    return {
+      message: `Task: "${task.title}" deleted`,
+    };
   }
 
   async getByTaskIdAndUserId(id: number, userId: number) {
@@ -111,5 +153,88 @@ export class TasksService {
       task,
       user,
     };
+  }
+
+  // Filters for getAll here
+  private prepareFilters(
+    keyword: string,
+    status: string,
+    daysLeft: string,
+    format: string,
+    userId: number,
+    page: string,
+    limit: string,
+  ) {
+    let queryBuilder = this.taskRepository.createQueryBuilder('task');
+    queryBuilder = queryBuilder.select(this.manyTasksFields);
+    queryBuilder = queryBuilder.where('task.userId = :userId', { userId });
+
+    if (keyword) queryBuilder = this.getKeywordFilter(queryBuilder, keyword);
+
+    if (status) queryBuilder = this.getStatusFilter(queryBuilder, status);
+
+    if (daysLeft && Number(daysLeft) > 0)
+      queryBuilder = this.getDaysLeftFilter(queryBuilder, Number(daysLeft));
+
+    if (format) queryBuilder = this.getFileFormatFilter(queryBuilder, format);
+
+    queryBuilder = this.getPaginationFilter(queryBuilder, page, limit);
+
+    return queryBuilder;
+  }
+
+  private getKeywordFilter(
+    queryBuilder: SelectQueryBuilder<Task>,
+    keyword: string,
+  ) {
+    return queryBuilder.andWhere(
+      '(task.title LIKE :keyword OR task.description LIKE :keyword OR task.comments LIKE :keyword OR task.tags LIKE :keyword)',
+      { keyword: `%${keyword}%` },
+    );
+  }
+
+  private getStatusFilter(
+    queryBuilder: SelectQueryBuilder<Task>,
+    status: string,
+  ) {
+    return queryBuilder.andWhere('task.status = :status', {
+      status,
+    });
+  }
+
+  private getDaysLeftFilter(
+    queryBuilder: SelectQueryBuilder<Task>,
+    daysLeft: number,
+  ) {
+    const currentDate = new Date();
+    const limitDate = new Date(
+      currentDate.getTime() + Number(daysLeft) * 24 * 60 * 60 * 1000,
+    );
+
+    const limitDateString = limitDate.toISOString().split('T')[0];
+
+    return queryBuilder.andWhere('task.deadline <= :limitDateString', {
+      limitDateString,
+    });
+  }
+
+  private getFileFormatFilter(
+    queryBuilder: SelectQueryBuilder<Task>,
+    format: string,
+  ) {
+    return queryBuilder.andWhere(
+      '(SUBSTRING_INDEX(task.file, ".", -1) = :format AND task.file IS NOT NULL)',
+      { format },
+    );
+  }
+
+  private getPaginationFilter(
+    queryBuilder: SelectQueryBuilder<Task>,
+    page: string,
+    limit: string,
+  ) {
+    const pageNumber = page ? parseInt(page, 10) : 1;
+    const limitNumber = limit ? parseInt(limit, 10) : 10;
+    return queryBuilder.skip((pageNumber - 1) * limitNumber).take(limitNumber);
   }
 }

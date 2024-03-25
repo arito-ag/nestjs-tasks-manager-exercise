@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -23,30 +24,35 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
-  // OK
   @Get()
   @UseGuards(AuthGuard)
-  async getAllTasks(@Request() req: RequestWithUser) {
+  getTasks(
+    @Request() req: RequestWithUser,
+    @Query('keyword') keyword?: string,
+    @Query('status') status?: string,
+    @Query('days') days?: string,
+    @Query('format') format?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
     const { username } = req.user;
-    return this.tasksService.getAll(username);
+    return this.tasksService.getAll(
+      username,
+      keyword,
+      status,
+      days,
+      format,
+      page,
+      limit,
+    );
   }
 
-  // OK
   @Get(':id')
   @UseGuards(AuthGuard, TaskGuard)
   async getOneTask(@Param('id', ParseIntPipe) id: number) {
     return this.tasksService.getById(id);
   }
 
-  // ToDo: Add Filters
-  @Get('filtered')
-  @UseGuards(AuthGuard)
-  getTaskByFilters(@Request() req: RequestWithUser) {
-    const { username } = req.user;
-    return this.tasksService.getByFilters(username);
-  }
-
-  // OK
   @Post()
   @UseGuards(AuthGuard)
   createTask(@Request() req: RequestWithUser, @Body() task: CreateTaskDto) {
