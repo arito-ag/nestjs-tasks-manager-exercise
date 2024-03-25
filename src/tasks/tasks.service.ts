@@ -27,16 +27,8 @@ export class TasksService {
     return this.taskRepository.find({ where: { userId } });
   }
 
-  async getById(id: number) {
-    const taskFound = await this.taskRepository.findOne({
-      where: {
-        id,
-      },
-    });
-
-    if (!taskFound) throw new UnauthorizedException();
-
-    return taskFound;
+  getById(id: number) {
+    return this.taskRepository.findOne({ where: { id } });
   }
 
   async getByFilters(username: string) {

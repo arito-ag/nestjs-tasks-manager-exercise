@@ -8,6 +8,8 @@ import { TransactionsModule } from './transactions/transactions.module';
 import { UsersModule } from './users/users.module';
 import { APP_PIPE } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { AllExceptionsFilter } from 'src/filters/all-exceptions.filter';
+import { APP_FILTER } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -28,6 +30,13 @@ import { ValidationPipe } from '@nestjs/common';
     UsersModule,
   ],
   controllers: [AppController],
-  providers: [{ provide: APP_PIPE, useClass: ValidationPipe }, AppService],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+    { provide: APP_PIPE, useClass: ValidationPipe },
+    AppService,
+  ],
 })
 export class AppModule {}
