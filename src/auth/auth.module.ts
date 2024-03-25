@@ -6,8 +6,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants/jwt.constant';
 import { TasksModule } from 'src/tasks/tasks.module';
 import { TransactionsModule } from 'src/transactions/transactions.module';
-import { AllExceptionsFilter } from 'src/filters/all-exceptions.filter';
-import { APP_FILTER } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -21,12 +19,6 @@ import { APP_FILTER } from '@nestjs/core';
     }),
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    {
-      provide: APP_FILTER,
-      useClass: AllExceptionsFilter,
-    },
-  ],
+  providers: [AuthService],
 })
 export class AuthModule {}
