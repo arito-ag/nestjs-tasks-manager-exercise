@@ -54,11 +54,11 @@ export class TasksService {
 
     const taskCreated = await this.taskRepository.save(newTask);
 
-    await this.transactionsService.create(
-      TRANSACTION_TYPES.TASK.COMPLETED.CREATED,
-      `Task ${newTask.id} created by ${username}`,
-      userFound.id,
-    );
+    await this.transactionsService.create({
+      type: TRANSACTION_TYPES.COMPLETED,
+      description: `Task ${newTask.id} created by ${username}`,
+      userId: userFound.id,
+    });
 
     return taskCreated;
   }
@@ -76,11 +76,11 @@ export class TasksService {
 
     const taskUpdated = await this.taskRepository.update(id, task);
 
-    await this.transactionsService.create(
-      TRANSACTION_TYPES.TASK.COMPLETED.UPDATED,
-      `Task ${id} updated by ${user.username}`,
-      taskInfo.userId,
-    );
+    await this.transactionsService.create({
+      type: TRANSACTION_TYPES.COMPLETED,
+      description: `Task ${id} updated by ${user.username}`,
+      userId: taskInfo.userId,
+    });
 
     return taskUpdated;
   }
@@ -89,11 +89,11 @@ export class TasksService {
     const { task, user } = await this.getTaskAndUserInfo(id);
     const deletedTask = await this.taskRepository.delete({ id });
 
-    await this.transactionsService.create(
-      TRANSACTION_TYPES.TASK.COMPLETED.DELETED,
-      `Task ${id} deleted by ${user.username}`,
-      task.userId,
-    );
+    await this.transactionsService.create({
+      type: TRANSACTION_TYPES.COMPLETED,
+      description: `Task ${id} deleted by ${user.username}`,
+      userId: task.userId,
+    });
 
     return deletedTask;
   }
