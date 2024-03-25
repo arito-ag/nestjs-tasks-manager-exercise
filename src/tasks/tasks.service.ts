@@ -90,6 +90,7 @@ export class TasksService {
       userId: userFound.id,
     });
 
+    delete taskCreated.userId;
     return taskCreated;
   }
 
