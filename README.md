@@ -48,7 +48,7 @@ $ npm run start:dev
 2. Login with *username* and *password* to get ***token***
 3. Use that token in the **tasks** endpoints.
 
-Note: Keep in mind that to use the **Update** endpoint of a ***Task***, it is necessary to use *Multipart Form* (in the client testing the app) to ensure the file upload to the AWS S3 bucket.
+Note: Keep in mind that to use the **Create** endpoint of a ***Task***, it is necessary to use *Multipart Form* (in the client testing the app) to ensure the file upload to the AWS S3 bucket.
 
 > More information in *Swagger docs*
 
