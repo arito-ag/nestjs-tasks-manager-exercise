@@ -12,7 +12,7 @@
 
 ## Description
 
-This is an example of a REST API created with  [Nest](https://github.com/nestjs/nest) framework TypeScript and [TypeORM]([Nest](https://github.com/nestjs/nest), using a MySQL database.
+This is an example of a REST API created with  [Nest](https://github.com/nestjs/nest) framework TypeScript and [TypeORM](https://github.com/typeorm/typeorm), using a MySQL database.
 
 It is a Task Manager where Users register and using the token provided at Login, they can only Consult, Create, Update, and Delete their tasks. Additionally, the actions they perform with their Tasks are stored in the database to keep track of possible errors.
 ## Install packages
