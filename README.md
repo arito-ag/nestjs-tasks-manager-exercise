@@ -35,6 +35,13 @@ $ npm run start
 # watch mode
 $ npm run start:dev
 
+# to see transactions logs
+$ docker exec -it mysql-db bash
+$ mysql -u user_db -p
+$ Enter password: "password here"
+$ use tasks_managment;
+$ select * from transactions;
+
 ```
 ## API REST prefix endpoints
 `http://localhost:3000/api/v1`
