@@ -6,6 +6,7 @@ import { Task } from './entities/task.entity';
 import { UsersModule } from 'src/users/users.module';
 import { TransactionsModule } from 'src/transactions/transactions.module';
 import { UploadModule } from 'src/upload/upload.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { UploadModule } from 'src/upload/upload.module';
     UsersModule,
     TransactionsModule,
     UploadModule,
+    JwtModule,
   ],
   controllers: [TasksController],
   providers: [TasksService],
