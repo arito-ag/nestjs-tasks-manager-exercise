@@ -5,25 +5,26 @@
 [circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
 [circleci-url]: https://circleci.com/gh/nestjs/nest
 
-## TASK MANAGER API REST
+## TASK MANAGER API REST :tw-1f3c1:
 
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+## Description :tw-1f4c4:
 
 This is an example of a REST API created with  [Nest](https://github.com/nestjs/nest) framework TypeScript and [TypeORM](https://github.com/typeorm/typeorm), using a MySQL database.
 
 It is a Task Manager where Users register and using the token provided at Login, they can only Consult, Create, Update, and Delete their tasks. Additionally, the actions they perform with their Tasks are stored in the database to keep track of possible errors.
-## Install packages
+
+## Install packages :tw-1f477:
 
 ```bash
 $ npm install
 ```
-## Use .env file
+## Use .env file :tw-1f6a7:
 This file was sent to the email, all you need to do is copy its content and create a .env file in the project root directory, at the same level as the docker-compose.yml.
 
-## Running the app
+## Running the app :tw-1f4bb:
 
 ```bash
 # docker for mysql db
@@ -43,13 +44,13 @@ $ use tasks_managment;
 $ select * from transactions;
 
 ```
-## API REST prefix endpoints
+## API REST prefix endpoints :tw-1f519:
 `http://localhost:3000/api/v1`
 
-## Swagger docs
+## Swagger docs :tw-1f4d6:
  `http://localhost:3000/docs`
 
-## How to use
+## How to use :tw-1f525:
 
 1.  Register in DB with endpoint User Register: `/api/v1/auth/register` providing *username* and *password*.
 2. Login with *username* and *password* to get ***token***
@@ -59,5 +60,5 @@ Note: Keep in mind that to use the **Create** endpoint of a ***Task***, it is ne
 
 > More information in *Swagger docs*
 
-## Contact
+## Contact :tw-1f4e8: :tw-1f4ea:
 <a href="https://www.linkedin.com/in/ariel-alvarez-gasca-4338812aa/" target="_blank"><img  src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/LinkedIn_icon.svg/2048px-LinkedIn_icon.svg.png?style=social&label=LinkedIn" width="20" height="20">LinkedIn</a>
